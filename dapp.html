@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blockchain Voting DApp</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
+</head>
+<body>
+
+<h2>Blockchain Voting System</h2>
+
+<button onclick="connectWallet()">Connect MetaMask</button>
+<p id="account"></p>
+
+<h3>Vote</h3>
+
+<input type="number" id="candidateId" placeholder="Enter Candidate ID">
+<button onclick="vote()">Vote</button>
+
+<script>
+let contract;
+let account;
+
+const contractAddress = "PASTE_DEPLOYED_CONTRACT_ADDRESS_HERE";
+
+const abi = [
+    {
+        "inputs":[{"internalType":"uint256","name":"_candidateId","type":"uint256"}],
+        "name":"vote",
+        "outputs":[],
+        "stateMutability":"nonpayable",
+        "type":"function"
+    }
+];
+
+async function connectWallet() {
+    if (window.ethereum) {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        window.web3 = new Web3(window.ethereum);
+        const accounts = await web3.eth.getAccounts();
+        account = accounts[0];
+        document.getElementById("account").innerText = "Connected: " + account;
+
+        contract = new web3.eth.Contract(abi, contractAddress);
+    }
+}
+
+async function vote() {
+    const id = document.getElementById("candidateId").value;
+    await contract.methods.vote(id).send({ from: account });
+    alert("Vote Successful!");
+}
+</script>
+
+</body>
+</html>
